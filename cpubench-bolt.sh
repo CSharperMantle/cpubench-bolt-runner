@@ -37,7 +37,7 @@ find "$WORK_DIR"/benchmarks \
 	\( -name '*.bolt-*' -o -name '*.prof.fdata*' \) \
 	-delete 2>/dev/null || true
 rm -f e.log o.log
-rm -rf -- "$WORK_DIR"/result_*
+rm -rf "$WORK_DIR"/result_*
 
 "$CPUBENCH_DIR"/cpubench.sh \
 	-c "$script_dir"/config/cpubench-original.ini \

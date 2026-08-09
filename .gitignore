@@ -2,8 +2,7 @@
 
 !/.editorconfig
 !/.gitignore
-!/cpubench-bolt.sh
-!/source-bolt-flags.sh
+!/*.sh
 !/LICENSE*
 !/README.txt
 !/config/

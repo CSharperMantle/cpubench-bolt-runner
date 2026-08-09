@@ -17,7 +17,7 @@ shopt -s nullglob
 _handle_signal() {
 	trap '' INT TERM
 	echo 'XXX I harness: Interrupt received, killing children...' >&2
-	kill -- -"$$" 2>/dev/null || true
+	kill -- -"$$" 2>/dev/null
 	exit $((128 + $1))
 }
 trap '_handle_signal $(kill -l INT)' INT
@@ -32,10 +32,10 @@ find "$WORK_DIR"/benchmarks \
 		-o -path '*/build/*_optimized' \
 	\) \
 	-prune \
-	-exec rm -rf {} + 2>/dev/null || true
+	-exec rm -rf {} + 2>/dev/null
 find "$WORK_DIR"/benchmarks \
 	\( -name '*.bolt-*' -o -name '*.prof.fdata*' \) \
-	-delete 2>/dev/null || true
+	-delete 2>/dev/null
 rm -f e.log o.log
 rm -rf "$WORK_DIR"/result_*
 
@@ -197,9 +197,9 @@ for tune in "${tunes[@]}"; do
 		parallel -0 --line-buffer -j "$BOLT_JOBS" bolt_with_profile {}
 done
 
-find "$WORK_DIR"/benchmarks -name '*.bolt-err' -exec cat {} + >e.log 2>/dev/null || true
-find "$WORK_DIR"/benchmarks -name '*.bolt-out' -exec cat {} + >o.log 2>/dev/null || true
-find "$WORK_DIR"/benchmarks \( -name '*.bolt-err' -o -name '*.bolt-out' \) -delete 2>/dev/null || true
+find "$WORK_DIR"/benchmarks -name '*.bolt-err' -exec cat {} + >e.log 2>/dev/null
+find "$WORK_DIR"/benchmarks -name '*.bolt-out' -exec cat {} + >o.log 2>/dev/null
+find "$WORK_DIR"/benchmarks \( -name '*.bolt-err' -o -name '*.bolt-out' \) -delete 2>/dev/null
 
 "$CPUBENCH_DIR"/cpubench.sh \
 	-c "$script_dir"/config/cpubench-optimized.ini \

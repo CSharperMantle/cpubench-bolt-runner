@@ -213,7 +213,7 @@ printf -- 'Test Results\n'
 printf -- '============\n'
 printf -- '\n'
 printf -- '\n'
-printf -- 'Lit-tests\n'
+printf -- 'Stages\n'
 printf -- '---------\n'
 printf -- '\n'
 printf -- '\t%s\tBuild\n' "$([ "$rc_build" -eq 0 ] && echo PASS || echo FAIL)"

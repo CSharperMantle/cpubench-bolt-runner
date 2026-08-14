@@ -146,4 +146,4 @@ fi
 printf -- '\n'
 printf -- '---\n'
 
-exit "$((rc_bolt | rc_optim))"
+exit "$((rc_optim))"

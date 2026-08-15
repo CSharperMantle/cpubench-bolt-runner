@@ -159,7 +159,7 @@ bolt_with_profile() {
 	else
 		printf 'XXX E MERGE-FDATA: %s\n%s\n' "$f" "$stdout" >>"$f".bolt-err
 		printf 'XXX E MERGE-FDATA: %s\n' "$f" >&2
-		return 0
+		return 1
 	fi
 	printf 'XXX I BOLT: %s\n' "$f" >&2
 	if stdout="$("$LLVM_PATH"/bin/llvm-bolt \
@@ -173,6 +173,7 @@ bolt_with_profile() {
 		printf 'XXX E BOLT: %s\n%s\n' "$f" "$stdout" >>"$f".bolt-err
 		printf 'XXX E BOLT: %s\n' "$f" >&2
 		cp -a "$orig" "$f"
+		return 1
 	fi
 }
 export -f bolt_with_profile

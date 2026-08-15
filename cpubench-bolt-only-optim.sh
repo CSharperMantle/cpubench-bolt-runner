@@ -87,7 +87,6 @@ bolt_with_profile() {
 	fi
 }
 export -f bolt_with_profile
-
 for tune in "${tunes[@]}"; do
 	for bm in "$WORK_DIR"/benchmarks/*; do
 		[ -d "$bm"/bin/"$tune"_original ] || continue

@@ -233,16 +233,6 @@ find "$WORK_DIR"/benchmarks \
 	-prune \
 	-exec rm -rf {} + 2>/dev/null
 rm -f e.log o.log
-rm -rf "$WORK_DIR"/result_*
-
-"$CPUBENCH_DIR"/cpubench.sh \
-	-c "$script_dir"/config/cpubench-original.ini \
-	-a build \
-	--work_dir "$WORK_DIR"
-rc_build=$?
-if [ "$rc_build" -ne 0 ]; then
-	exit "$rc_build"
-fi
 
 tunes=()
 declare -A seen_tunes=()
@@ -256,15 +246,6 @@ while IFS= read -r -d '' dir; do
 done < <(find "$WORK_DIR"/benchmarks -type d -path '*/bin/*_original' -print0)
 if [ "${#tunes[@]}" -eq 0 ]; then
 	exit 3
-fi
-
-"$CPUBENCH_DIR"/cpubench.sh \
-	-c "$script_dir"/config/cpubench-original.ini \
-	-a run \
-	--work_dir "$WORK_DIR"
-rc_orig=$?
-if [ "$rc_orig" -ne 0 ]; then
-	exit "$rc_orig"
 fi
 
 for tune in "${tunes[@]}"; do
@@ -330,8 +311,8 @@ printf -- '\n'
 printf -- 'Stages\n'
 printf -- '---------\n'
 printf -- '\n'
-printf -- '\t%s\tBuild\n' "$([ "$rc_build" -eq 0 ] && echo PASS || echo FAIL)"
-printf -- '\t%s\tRun-original\n' "$([ "$rc_orig" -eq 0 ] && echo PASS || echo FAIL)"
+printf -- '\t%s\tBuild\n' '---'
+printf -- '\t%s\tRun-original\n' '---'
 printf -- '\t%s\tRun-perf1\n' "$([ "$rc_profile" -eq 0 ] && echo PASS || echo FAIL)"
 printf -- '\t%s\tProfile-map\n' "$([ "$rc_index" -eq 0 ] && echo PASS || echo FAIL)"
 printf -- '\t%s\tperf2bolt/BOLT\n' "$([ "$rc_bolt" -eq 0 ] && echo PASS || echo FAIL)"
@@ -350,4 +331,4 @@ fi
 printf -- '\n'
 printf -- '---\n'
 
-exit "$((rc_build | rc_orig | rc_profile | rc_index | rc_bolt | rc_optim))"
+exit "$((rc_profile | rc_index | rc_bolt | rc_optim))"

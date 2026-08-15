@@ -217,32 +217,15 @@ export -f restore_basic_event_header bolt_with_perf_profile
 find "$WORK_DIR"/benchmarks \
 	-type d \
 	\( \
-		-path '*/bin/*_perf1' \
-		-o -path '*/bin/*_optimized' \
-		-o -path '*/build/*_perf1' \
+		-path '*/bin/*_optimized' \
 		-o -path '*/build/*_optimized' \
 	\) \
 	-prune \
 	-exec rm -rf {} + 2>/dev/null
 find "$WORK_DIR"/benchmarks \
-	\( -name '*.bolt-*' -o -name '*.prof.fdata*' -o -name '*.perf1-data-list' \) \
+	\( -name '*.bolt-*' \) \
 	-delete 2>/dev/null
-find "$WORK_DIR"/benchmarks \
-	-type d \
-	-path '*/collect/bolt' \
-	-prune \
-	-exec rm -rf {} + 2>/dev/null
 rm -f e.log o.log
-rm -rf "$WORK_DIR"/result_*
-
-"$CPUBENCH_DIR"/cpubench.sh \
-	-c "$script_dir"/config/cpubench-original.ini \
-	-a build \
-	--work_dir "$WORK_DIR"
-rc_build=$?
-if [ "$rc_build" -ne 0 ]; then
-	exit "$rc_build"
-fi
 
 tunes=()
 declare -A seen_tunes=()
@@ -256,34 +239,6 @@ while IFS= read -r -d '' dir; do
 done < <(find "$WORK_DIR"/benchmarks -type d -path '*/bin/*_original' -print0)
 if [ "${#tunes[@]}" -eq 0 ]; then
 	exit 3
-fi
-
-"$CPUBENCH_DIR"/cpubench.sh \
-	-c "$script_dir"/config/cpubench-original.ini \
-	-a run \
-	--work_dir "$WORK_DIR"
-rc_orig=$?
-if [ "$rc_orig" -ne 0 ]; then
-	exit "$rc_orig"
-fi
-
-for tune in "${tunes[@]}"; do
-	for bm in "$WORK_DIR"/benchmarks/*; do
-		[ -d "$bm"/bin/"$tune"_original ] || continue
-		rm -rf "$bm"/bin/"$tune"_perf1 "$bm"/build/"$tune"_perf1
-		mkdir -p "$bm"/bin/"$tune"_perf1 "$bm"/build/"$tune"_perf1 || exit 3
-		cp -a "$bm"/bin/"$tune"_original/. "$bm"/bin/"$tune"_perf1/ || exit 3
-		cp -a "$bm"/build/"$tune"_original/. "$bm"/build/"$tune"_perf1/ || exit 3
-	done
-done
-
-"$CPUBENCH_DIR"/cpubench.sh \
-	-c "$script_dir"/config/cpubench-perf1.ini \
-	-a run \
-	--work_dir "$WORK_DIR"
-rc_profile=$?
-if [ "$rc_profile" -ne 0 ]; then
-	exit "$rc_profile"
 fi
 
 index_perf_profiles
@@ -330,9 +285,9 @@ printf -- '\n'
 printf -- 'Stages\n'
 printf -- '---------\n'
 printf -- '\n'
-printf -- '\t%s\tBuild\n' "$([ "$rc_build" -eq 0 ] && echo PASS || echo FAIL)"
-printf -- '\t%s\tRun-original\n' "$([ "$rc_orig" -eq 0 ] && echo PASS || echo FAIL)"
-printf -- '\t%s\tRun-perf1\n' "$([ "$rc_profile" -eq 0 ] && echo PASS || echo FAIL)"
+printf -- '\t%s\tBuild\n' '---'
+printf -- '\t%s\tRun-original\n' '---'
+printf -- '\t%s\tRun-perf1\n' '---'
 printf -- '\t%s\tProfile-map\n' "$([ "$rc_index" -eq 0 ] && echo PASS || echo FAIL)"
 printf -- '\t%s\tperf2bolt/BOLT\n' "$([ "$rc_bolt" -eq 0 ] && echo PASS || echo FAIL)"
 printf -- '\t%s\tRun-optimized\n' "$([ "$rc_optim" -eq 0 ] && echo PASS || echo FAIL)"
@@ -350,4 +305,4 @@ fi
 printf -- '\n'
 printf -- '---\n'
 
-exit "$((rc_build | rc_orig | rc_profile | rc_index | rc_bolt | rc_optim))"
+exit "$((rc_index | rc_bolt | rc_optim))"
